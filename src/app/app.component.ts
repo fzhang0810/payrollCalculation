@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Employee, Deductions, Dependent } from './model/employee.model';
+import { Employee, Payroll, Dependent } from './model/employee.model';
 import { EmployeeService } from './services/employee.service';
 import { HttpClient } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
@@ -38,7 +38,9 @@ export class AppComponent implements OnInit {
   emailDependent = '';
   dataSource = new MatTableDataSource<TableElement>();
   dataSourceE = new MatTableDataSource<TableElementEmployee>();
+  dataSourceAll = new MatTableDataSource<TableElementEmployee>();
   isDependentAdded = false;
+  totalCost = 0;
   constructor(
     private _employeeService: EmployeeService,
   ) { }
@@ -47,6 +49,22 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
 
+  }
+
+  getAllEmployee() {
+    this._employeeService.getAllEmployee().subscribe(res => {
+      console.log(res);
+      const data = [];
+      if (res.EmployeePayroll && res.EmployeePayroll.length > 0) {
+        res.EmployeePayroll.forEach(d => {
+          data.push({name: d.Name,  employeeId: d.EmployeeId,
+          emailAddress: d.Email, phoneNumber: d.PhoneNumber, benefitCost:
+          d.AnnualBenefitCosts, incomeYearly: d.TakeHomeIncomeYearly, incomePerPay: d.TakeHomeIncomeMonthly});
+          this.dataSourceAll.data = data;
+         });
+        this.totalCost = res.TotalBenefitCosts;
+    }
+    });
   }
 
   selectDependent($event) {
@@ -58,9 +76,8 @@ export class AppComponent implements OnInit {
     this.selectedDependents.forEach(element => {
       rowKey.push(this.dataSource.data[element].employeeId);
     });
-    const api = 'https://localhost:44392/api/delete/dependents/employname';
     this._employeeService.removeDependent(this.name, this.employeeId, rowKey).subscribe(res => {
-      this.dataSourceE.data = [{name: res.FullName,  employeeId: this.employeeId,
+      this.dataSourceE.data = [{name: res.Name,  employeeId: this.employeeId,
         emailAddress: res.Email, phoneNumber: res.PhoneNumber, benefitCost: res.AnnualBenefitCosts,
         incomeYearly: res.TakeHomeIncomeYearly, incomePerPay: res.TakeHomeIncomeMonthly}];
       this.initDataSource(res);
@@ -70,7 +87,7 @@ export class AppComponent implements OnInit {
 
   getEmployee() {
     this._employeeService.getEmployee(this.name, this.employeeId).subscribe(res => {
-      this.dataSourceE.data = [{name: res.FullName,  employeeId: this.employeeId,
+      this.dataSourceE.data = [{name: res.Name,  employeeId: this.employeeId,
          emailAddress: res.Email, phoneNumber: res.PhoneNumber, benefitCost: res.AnnualBenefitCosts,
          incomeYearly: res.TakeHomeIncomeYearly, incomePerPay: res.TakeHomeIncomeMonthly}];
       const data = [];
@@ -102,11 +119,10 @@ export class AppComponent implements OnInit {
     dependent.Email = this.emailDependent;
     dependent.FullName = this.nameDependent;
     dependent.PhoneNumber = this.numberDependent;
-    const api = 'https://localhost:44392/api/employee';
     this._employeeService.addDependent(this.name, this.employeeId, dependent).subscribe(res => {
       console.log(res);
       this.dataSource.data = this.initDataSource(res);
-      this.dataSourceE.data = [{name: res.FullName,  employeeId: this.employeeId,
+      this.dataSourceE.data = [{name: res.Name,  employeeId: this.employeeId,
         emailAddress: res.Email, phoneNumber: res.PhoneNumber, benefitCost: res.AnnualBenefitCosts,
         incomeYearly: res.TakeHomeIncomeYearly, incomePerPay: res.TakeHomeIncomeMonthly}];
     });

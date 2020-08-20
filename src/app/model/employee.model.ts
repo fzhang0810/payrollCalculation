@@ -1,16 +1,17 @@
 export class Employee {
     Email: string;
     PhoneNumber: string;
-    FullName: string;
+    Name: string;
     AnnualBenefitCosts: number;
     numberOfDependents: number;
     Dependents: [Dependent];
     TakeHomeIncomeMonthly: number;
     TakeHomeIncomeYearly: number;
+    EmployeeId: string;
     constructor() {
         this.Email = '';
         this.PhoneNumber = '';
-        this.FullName = '';
+        this.Name = '';
     }
 }
 
@@ -27,12 +28,12 @@ export class Dependent {
     }
 }
 
-export class Deductions {
-    deduction: string;
-    amount: number;
+export class Payroll {
+    EmployeePayroll: Array<Employee>;
+    TotalBenefitCosts: number;
     constructor(
     ) {
-        this.deduction = '';
-        this.amount = 0;
+        this.EmployeePayroll = [];
+        this.TotalBenefitCosts = 0;
     }
 }

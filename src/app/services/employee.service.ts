@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 
 // RxJS operator for mapping the observable
 
-import { Employee, Dependent } from '../model/employee.model';
+import { Employee, Dependent, Payroll } from '../model/employee.model';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -12,6 +12,7 @@ export class EmployeeService {
 
     api = 'https://localhost:44392/api/employee';
     EmployeeUrl = 'https://localhost:44392/api/delete/dependents/employname';
+    allEmployees = 'https://localhost:44392/api/getallemployees';
 
     constructor(
         private http: HttpClient
@@ -27,5 +28,9 @@ export class EmployeeService {
 
     removeDependent(name: string, employeeId: string, rowKey: string[]): Observable<Employee> {
         return this.http.post<Employee>(`${this.EmployeeUrl}/${name}/${employeeId}`, rowKey);
+    }
+
+    getAllEmployee(): Observable<Payroll> {
+        return this.http.get<Payroll>(`${this.allEmployees}`);
     }
  }
